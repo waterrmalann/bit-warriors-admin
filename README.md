@@ -18,7 +18,7 @@
 ## 🚀 Getting Started
 
 >[!NOTE]
-> **BitWarriors** is a project built using the Microservices architecture. The user facing side of the application (ie: Frontend built using [Next.js]((https://github.com/waterrmalann/bit-warriors-nextjs)) and [Backend services](https://github.com/waterrmalann/bit-warriors-backend)) must be running in order for the Admin panel to start serving its purpose. Both of these are under heavy development. Stay tuned for instructions to self-host!
+> **BitWarriors** is a project built using the Microservices architecture. The user facing side of the application (ie: [Frontend with Next.js](https://github.com/waterrmalann/bit-warriors-nextjs) and [Backend services](https://github.com/waterrmalann/bit-warriors-backend)) must be running in order for the Admin panel to start serving its purpose. Both of these are under heavy development. Stay tuned for instructions to self-host!
 
 ## 🤝 Contribution
 
