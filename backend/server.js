@@ -7,16 +7,24 @@ import { isAuthorized } from './middlewares/authorization.js';
 import problemsRouter from './routers/problemsRouter.js';
 import authRouter from './routers/authRouter.js';
 import { nanoid } from 'nanoid';
+import connectDB from './helpers/db.js';
 dotenv.config();
 
+connectDB();
 const app = express();
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+    //! Vite Frontend Port
+    origin: 'http://localhost:5000',
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
     //* use redis in prod
-    secret: nanoid(),
+    // secret: nanoid(),
+    secret: "abc",
     resave: false,
     saveUninitialized: true,
     // cookie: { secure: true }
