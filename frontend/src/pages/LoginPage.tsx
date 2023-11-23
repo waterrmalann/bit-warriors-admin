@@ -5,10 +5,12 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils"
 import { Link, useNavigate } from "react-router-dom"
 import { useEffect, useState } from 'react';
+// import { useAdmin } from '@hooks/useAdmin';
 
 
 export default function AdminLoginPage() {
     const navigate = useNavigate();
+    // const { isLoggedIn } = useAdmin();
 
     // State that determines if we are finally A-Ok for login.
     const [ok, setOk] = useState(false);

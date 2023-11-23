@@ -1,17 +1,18 @@
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useToast } from "@components/ui/use-toast";
 import LoadingSpinner from "@components/LoadingSpinner";
-import { useEffect } from "react";
+import { isValidElement, useEffect } from "react";
 import { useAdmin } from "@hooks/useAdmin";
 
 const PrivateRoute = () => {
-    const { admin, error, loading } = useAdmin();
+    const { admin, error, loading, validating } = useAdmin();
     const { toast } = useToast();
     const navigate = useNavigate();
 
     // useEffect to handle navigation on error
     useEffect(() => {
-        if (error) {
+        if (error && !validating) {
+            console.log(error);
             toast({ variant: "destructive", title: "An error occurred." });
             navigate('/login');
         }

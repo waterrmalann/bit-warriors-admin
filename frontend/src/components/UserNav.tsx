@@ -15,12 +15,17 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAdmin } from "@hooks/useAdmin";
+import { useNavigate } from "react-router-dom";
 
 export function UserNav() {
-
-  function handleLogout(e: React.SyntheticEvent) {
+  const { logout } = useAdmin();
+  const navigate = useNavigate();
+  async function handleLogout(e: React.SyntheticEvent) {
     e.preventDefault();
     console.log("admin wishes to log out.");
+    await logout();
+    navigate('/login', { replace: true })
   }
 
   return (

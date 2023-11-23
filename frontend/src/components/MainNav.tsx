@@ -12,25 +12,25 @@ export function MainNav({
       {...props}
     >
       <Link
-        to="/admin"
+        to="/dash"
         className="text-sm font-medium transition-colors hover:text-primary"
       >
         Overview
       </Link>
       <Link
-        to="/admin/problems"
+        to="/dash/problems"
         className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
       >
         Problems
       </Link>
       <Link
-        to="/admin/tracks"
+        to="/dash/tracks"
         className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
       >
         Learning Tracks
       </Link>
       <Link
-        to="/admin/settings"
+        to="/dash/settings"
         className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
       >
         Settings

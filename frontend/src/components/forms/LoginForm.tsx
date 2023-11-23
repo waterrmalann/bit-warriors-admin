@@ -36,12 +36,15 @@ export function LoginForm({ className, setOk, ...props }: LoginFormProps) {
         if (username && password) {
             setError(null);
             setIsLoading(true);
-            const { error: err } = await trigger(username, password);
+            const { data, error: err } = await trigger(username, password);
             setIsLoading(false);
+
             if (err) {
                 console.error(error);
                 setError(err);
-            } else {
+            }
+
+            if (data) {
                 setOk(true);
             }
         }
