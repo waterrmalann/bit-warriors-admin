@@ -11,6 +11,8 @@ import DashboardHomePage from '@pages/DashboardHomePage.tsx';
 import NotFoundPage from '@pages/NotFoundPage.tsx';
 import HomePage from '@pages/HomePage.tsx';
 import DashboardProblemsPage from '@pages/DashboardProblemsPage.tsx';
+import DashboardNewProblemPage from '@pages/DashboardNewProblemPage.tsx';
+import DashboardEditProblemPage from '@pages/DashboardEditProblemPage.tsx';
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -23,6 +25,8 @@ const router = createBrowserRouter(
                 <Route path="/dash" element={<DashboardLayout />}>
                     <Route index element={<DashboardHomePage />} />
                     <Route path="problems" element={<DashboardProblemsPage />} />
+                    <Route path="new-problem" element={<DashboardNewProblemPage />} />
+                    <Route path="problems/:id" element={<DashboardEditProblemPage />} />
                     {/* <Route path="boards/:boardId" element={<BoardViewPage />} /> */}
                     {/* <Route path="/:" */}
                 </Route>
