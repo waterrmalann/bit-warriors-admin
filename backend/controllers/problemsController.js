@@ -20,7 +20,7 @@ const GetProblem = asyncHandler(async (req, res) => {
             return res.status(404).send({ message: "Problem not found" });
         }
 
-        res.status(200).send({ message: "Problem fetched successfully", problem });
+        res.status(200).json(problem);
     } catch (error) {
         res.status(500).send({ message: "Error fetching problem", error: error.message });
     }
