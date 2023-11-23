@@ -11,6 +11,7 @@ const GetAuth = asyncHandler(async (req, res) => {
 
 const PostLogin = asyncHandler(async (req, res) => {
     const { email, passphrase } = req.body;
+    console.log(`[login] ${email} has entered sudo.`)
     // todo: Much needed validation!
     const admin = await Admin.findOne({ email: email });
 
@@ -29,12 +30,14 @@ const PostLogin = asyncHandler(async (req, res) => {
 
 const GetLogout = asyncHandler(async (req, res) => {
     req.session.destroy(err => {
+        res.clearCookie('connect.sid');
         if (err) {
             res.status(500).json({ success: false, message: err });
         } else {
+            console.log("[logout] admin logged out successfully")
             res.status(200).json({ success: true, message: "Logged out" });
         }   
-    })
+    });
 });
 
 export default { GetAuth, PostLogin, GetLogout };
