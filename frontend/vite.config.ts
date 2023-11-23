@@ -7,13 +7,15 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:4000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
+    cors: false
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:4000/',
+    //     changeOrigin: true,
+    //     secure: false,
+    //     rewrite: (path) => path.replace(/^\/api/, ''),
+    //   },
+    // },
   },
   resolve: {
     alias: {
