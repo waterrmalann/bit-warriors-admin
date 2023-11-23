@@ -4,7 +4,7 @@ import asyncHandler from 'express-async-handler';
 const GetProblems = asyncHandler(async (req, res) => {
     try {
         const problems = await Problem.find();
-        res.status(200).send({ problems });
+        res.status(200).send(problems);
     } catch (error) {
         res.status(500).send({ message: "Could not fetch problems.", error: error.message });
     }
@@ -31,14 +31,12 @@ const PostProblem = asyncHandler(async (req, res) => {
         title,
         description,
         difficulty,
-        constraints,
-        examples,
         tags,
         hint
     } = req.body;
 
-    const problem = await Problem.create({ title, description, difficulty, constraints, examples, tags, hint });
-    res.status(201).send({ message: "Problem was creaed successfully", problemId: problem._id });
+    const problem = await Problem.create({ title, description, difficulty, tags, hint });
+    res.status(201).send({ problemId: problem._id });
 })
 
 const PutProblem = asyncHandler(async (req, res) => {
@@ -47,8 +45,6 @@ const PutProblem = asyncHandler(async (req, res) => {
         title,
         description,
         difficulty,
-        constraints,
-        examples,
         tags,
         hint
     } = req.body;
@@ -58,8 +54,6 @@ const PutProblem = asyncHandler(async (req, res) => {
             title,
             description,
             difficulty,
-            constraints,
-            examples,
             tags,
             hint
         }, { new: true });
@@ -68,9 +62,9 @@ const PutProblem = asyncHandler(async (req, res) => {
             return res.status(404).send({ message: "Problem not found" });
         }
 
-        res.status(200).send({ message: "Problem updated successfully", updatedProblem });
+        res.status(200).send({ success: true });
     } catch (error) {
-        res.status(500).send({ message: "Error updating problem", error: error.message });
+        res.status(500).send({ message: error.message });
     }
 })
 
@@ -84,9 +78,9 @@ const DeleteProblem = asyncHandler(async (req, res) => {
             return res.status(404).send({ message: "Problem not found" });
         }
 
-        res.status(200).send({ message: "Problem deleted successfully", deletedProblem });
+        res.status(200).send({ success: true });
     } catch (error) {
-        res.status(500).send({ message: "Error deleting problem", error: error.message });
+        res.status(500).send({ message: error.message });
     }
 })
 
