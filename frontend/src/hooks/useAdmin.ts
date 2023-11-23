@@ -16,13 +16,15 @@ async function adminFetcher(url: string) {
 }
 
 export function useAdmin() {
-    const { data: admin, mutate, error, isLoading } = useSWR<Admin>(API_ROUTES.AUTH.GET, adminFetcher);
+    const { data: admin, mutate, error, isLoading, isValidating } = useSWR<Admin>(API_ROUTES.AUTH.GET, adminFetcher);
 
     const loading = admin === undefined && error === undefined;
     const isLoggedIn = !!admin && !isLoading; // error && error.status === 403;
 
     const logout = async () => {
         const request = await fetch(API_ROUTES.AUTH.LOGOUT_GET, { credentials: 'include' });
+        console.log("Logged Out");
+        console.log(request);
         if (!request.ok) {
             throw new Error("Could not log out.");
         }
@@ -33,8 +35,9 @@ export function useAdmin() {
         admin,
         error,
         loading,
+        validating: isValidating,
         mutate,
         logout,
         isLoggedIn,
     };
-};
+}

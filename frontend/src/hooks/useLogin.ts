@@ -1,10 +1,8 @@
-"use client";
-
 import { API_ROUTES } from '@/lib/routes';
 import axios, { AxiosResponse } from 'axios';
 
 type LoginCredentials = {
-    username: string;
+    email: string;
     passphrase: string;
 };
 
@@ -14,10 +12,10 @@ interface LoginResult {
     token: string
 }
 
-async function loginPost(url: string, { username, passphrase }: LoginCredentials) {
+async function loginPost(url: string, { email, passphrase }: LoginCredentials) {
     try {
         const res = await axios.post(url, {
-            username, passphrase
+            email, passphrase
         }, {
             headers: { "Content-Type": "application/json" },
             withCredentials: true, // get cookies
@@ -34,8 +32,8 @@ async function loginPost(url: string, { username, passphrase }: LoginCredentials
 
 export default function useLogin() {
     return {
-        trigger: async (username: string, passphrase: string) => {
-            return loginPost(API_ROUTES.AUTH.LOGIN_POST, { username, passphrase })
+        trigger: async (email: string, passphrase: string) => {
+            return loginPost(API_ROUTES.AUTH.LOGIN_POST, { email, passphrase })
         },
         isMutating: false
     };
