@@ -15,16 +15,19 @@ const problemSchema = new mongoose.Schema({
         required: true
     },
     constraints: {
-        type: String,
-        required: true
+        type: [String],
+        required: true,
+        default: []
     },
     examples: {
-        type: String,
-        required: true
+        type: [String],
+        required: true,
+        default: []
     },
     tags: {
         type: [String],
-        required: true
+        required: true,
+        default: []
     },
     hint: {
         type: String
