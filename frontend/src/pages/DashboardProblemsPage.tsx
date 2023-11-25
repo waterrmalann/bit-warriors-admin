@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ProblemCard } from '@components/problems/ProblemCard';
+import { Input } from '@components/ui/input';
 import useProblem from '@hooks/useProblem';
 import { Link } from 'react-router-dom';
 
@@ -16,6 +17,7 @@ const DashboardProblemsPage = () => {
           </div>
         </div>
         <div className="space-y-4">
+          <Input name="Searchbar" placeholder="Search" className="border-gray-500 md:w-[100px] lg:w-[500px]" />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {problems?.map((e, index) => 
               <ProblemCard key={e._id} title={e.title} code={`#${index}`} _id={e._id} updatedAt={new Date()} />

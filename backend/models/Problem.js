@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
+import { nanoid } from 'nanoid';
 
 const problemSchema = new mongoose.Schema({
+    problemId: {
+        type: String,
+        required: true,
+        default: nanoid
+    },
     title: {
         type: String,
         required: true
