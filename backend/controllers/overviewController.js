@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import dotenv from 'dotenv';
-import { humanizeDuration } from 'humanize-duration';
+import humanizePkg from 'humanize-duration';
+const { humanizeDuration } = humanizePkg;
 dotenv.config();
 
 // todo: Need a service discovery.
