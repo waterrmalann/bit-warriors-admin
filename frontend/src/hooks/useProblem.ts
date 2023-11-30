@@ -4,6 +4,7 @@ import useSWR from 'swr';
 
 type Problem = { 
     _id: string;
+    problemId: string;
     title: string;
     description: string;
     difficulty: string;
@@ -11,7 +12,7 @@ type Problem = {
     hint?: string;
 }
 
-type ProblemData = Omit<Problem, "_id">;
+type ProblemData = Omit<Problem, "_id" | "problemId">;
 
 interface ProblemCreationResponse {
     problemId: string;
@@ -58,11 +59,13 @@ async function problemsFetcher(url: string) {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
     }) as AxiosResponse<Problem[]>;
+    console.log("Axios", res);
     return res.data;
 }
 
 export default function useProblem() {
     const { data: problems, mutate, error, isLoading } = useSWR<Problem[]>(API_ROUTES.PROBLEMS.GET, problemsFetcher);
+    console.log(problems);
 
     return {
         createProblem: async (data: ProblemData) => {

@@ -19,8 +19,8 @@ const DashboardProblemsPage = () => {
         <div className="space-y-4">
           <Input name="Searchbar" placeholder="Search" className="border-gray-500 md:w-[100px] lg:w-[500px]" />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {problems?.map((e, index) => 
-              <ProblemCard key={e._id} title={e.title} code={`#${index}`} _id={e._id} updatedAt={new Date()} />
+            {problems?.map((e) => 
+              <ProblemCard key={e._id} title={e.title} code={`#${e.problemId}`} _id={e._id} updatedAt={new Date()} />
             )}
           </div>
         </div>
