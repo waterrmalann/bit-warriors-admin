@@ -8,11 +8,22 @@ const kafka = new Kafka({
     brokers: ['localhost:29092'],
 });
 
+const admin = kafka.admin();
+
 const producer = kafka.producer();
 
 const run = async () => {
-  await producer.connect();
-  console.log("💬 Established connection with Kafka.");
+    await admin.connect();
+    await admin.createTopics({
+        waitForLeaders: true,
+        topics: [
+            { topic: 'PROBLEM_CREATION' },
+            { topic: 'PROBLEM_UPDATION' },
+            { topic: 'PROBLEM_DELETION' },
+        ],
+    })
+    await producer.connect();
+    console.log("💬 Established connection with Kafka.");
 };
 
 run().catch(console.error);
@@ -54,10 +65,15 @@ const PostProblem = asyncHandler(async (req, res) => {
     const problem = await Problem.create({ title, description, difficulty, tags, hint });
 
     const message = { key: 'problem_created', value: JSON.stringify(problem) };
-    await producer.send({
-        topic: 'PROBLEM_CREATION',
-        messages: [message],
-    });
+    try {
+        await producer.send({
+            topic: 'PROBLEM_CREATION',
+            messages: [message],
+        });
+        console.log(`[kafka] creation message was sent ${JSON.stringify(message)}`)
+    } catch (err) {
+        console.error(`err: [kafka/problem_updated] ${err}`);
+    }
 
     res.status(201).send({ problemId: problem._id });
 })
@@ -82,10 +98,16 @@ const PutProblem = asyncHandler(async (req, res) => {
         }
 
         const message = { key: 'problem_updated', value: JSON.stringify({ id: updatedProblem.problemId, data: data }) };
-        await producer.send({
-            topic: 'PROBLEM_UPDATION',
-            messages: [message],
-        });
+
+        try {
+            await producer.send({
+                topic: 'PROBLEM_UPDATION',
+                messages: [message],
+            });
+            console.log(`[kafka] updation message was sent ${JSON.stringify(message)}`)
+        } catch (err) {
+            console.error(`err: [kafka/problem_updated] ${err}`);
+        }
 
         res.status(200).send({ success: true });
     } catch (error) {
@@ -104,10 +126,15 @@ const DeleteProblem = asyncHandler(async (req, res) => {
         }
 
         const message = { key: 'problem_deleted', value: JSON.stringify({ id: deletedProblem.problemId }) };
-        await producer.send({
-            topic: 'PROBLEM_DELETION',
-            messages: [message],
-        });
+        try {
+            await producer.send({
+                topic: 'PROBLEM_DELETION',
+                messages: [message],
+            });
+            console.log(`[kafka] deletion message was sent ${JSON.stringify(message)}`)
+        } catch (err) {
+            console.error(`err: [kafka/problem_updated] ${err}`);
+        }
 
         res.status(200).send({ success: true });
     } catch (error) {
