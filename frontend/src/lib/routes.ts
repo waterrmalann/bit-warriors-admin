@@ -10,5 +10,8 @@ export const API_ROUTES = {
         POST: "http://localhost:4000/problems",
         PUT: (id: string) => `http://localhost:4000/problems/${id}`,
         DELETE: (id: string) => `http://localhost:4000/problems/${id}`
+    },
+    OVERVIEW: {
+        STATUS_GET: "http://localhost:4000/overview/status"
     }
 };
