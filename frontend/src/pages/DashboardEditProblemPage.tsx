@@ -32,7 +32,7 @@ export default function DashboardEditProblemPage() {
     const [questionDescription, setQuestionDescription] = useState(() => problem?.description ?? '');
     const [questionTitle, setQuestionTitle] = useState(problem?.title ?? '');
     const [questionDifficulty, setQuestionDifficulty] = useState(problem?.difficulty ?? '');
-    const [questionTags, setQuestionTags] = useState(problem?.tags ?? '');
+    const [questionTags, setQuestionTags] = useState(problem?.tags.join(',') ?? '');
     const [questionHint, setQuestionHint] = useState(problem?.hint ?? '');
 
     useEffect(() => {
@@ -40,7 +40,7 @@ export default function DashboardEditProblemPage() {
             setQuestionDescription(problem?.description);
             setQuestionTitle(problem?.title);
             setQuestionDifficulty(problem?.difficulty);
-            setQuestionTags(problem?.tags);
+            setQuestionTags(problem?.tags.join(','));
             setQuestionHint(problem?.hint ?? '');
             firstFetch.current = false;
         }
@@ -99,7 +99,7 @@ export default function DashboardEditProblemPage() {
             title: questionTitle,
             description: questionDescription,
             difficulty: questionDifficulty,
-            tags: questionTags,
+            tags: questionTags.split(','),
             hint: questionHint
         });
 

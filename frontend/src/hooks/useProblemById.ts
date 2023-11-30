@@ -7,7 +7,7 @@ type Problem = {
     title: string;
     description: string;
     difficulty: string;
-    tags: string;
+    tags: string[];
     hint?: string;
 }
 
