@@ -5,6 +5,7 @@ import session from 'express-session';
 import { errorHandler, notFound } from './middlewares/errors.js';
 import { isAuthorized } from './middlewares/authorization.js';
 import problemsRouter from './routers/problemsRouter.js';
+import overviewRouter from './routers/overviewRouter.js';
 import authRouter from './routers/authRouter.js';
 import { nanoid } from 'nanoid';
 import connectDB from './helpers/db.js';
@@ -32,6 +33,7 @@ app.use(session({
 
 app.use('/auth', authRouter);
 app.use('/problems', isAuthorized, problemsRouter);
+app.use('/overview', isAuthorized, overviewRouter);
 
 app.use(notFound);
 app.use(errorHandler);
