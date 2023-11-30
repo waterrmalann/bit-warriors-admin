@@ -15,6 +15,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
@@ -68,6 +75,7 @@ export default function DashboardNewProblemPage() {
     });
 
     if (error) {
+      console.error(error);
       return toast({
         variant: "destructive",
         title: "An error occured.",
@@ -75,7 +83,7 @@ export default function DashboardNewProblemPage() {
       })
     } else {
       toast({
-      title: "Success",
+        title: "Success",
         description: "Problem was added."
       });
       navigate('/dash/problems');
@@ -310,11 +318,16 @@ export default function DashboardNewProblemPage() {
                           value={questionTitle} onChange={e => setQuestionTitle(e.target.value)}
                         />
                         <Label htmlFor="difficultyInput">Difficulty</Label>
-                        <Input
-                          className="my-2" id="difficultyInput"
-                          placeholder="Easy, Medium, or Hard"
-                          value={questionDifficulty} onChange={e => setQuestionDifficulty(e.target.value)}
-                        />
+                        <Select value={questionDifficulty} onValueChange={val => setQuestionDifficulty(val)}>
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Choose Difficulty" />
+                          </SelectTrigger>
+                          <SelectContent id="difficultyInput">
+                            <SelectItem value="Easy">Easy</SelectItem>
+                            <SelectItem value="Medium">Medium</SelectItem>
+                            <SelectItem value="Hard">Hard</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <Label htmlFor="tagInput">Tags</Label>
                         <Input
                           className="my-2" id="tagInput"
