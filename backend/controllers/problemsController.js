@@ -2,26 +2,27 @@ import Problem from "../models/Problem.js";
 import asyncHandler from 'express-async-handler';
 
 import { Kafka } from 'kafkajs';
+import slugify from "slugify";
 
 const kafka = new Kafka({
     clientId: 'admin-service',
     brokers: ['localhost:29092'],
 });
 
-const admin = kafka.admin();
+// const admin = kafka.admin();
 
 const producer = kafka.producer();
 
 const run = async () => {
-    await admin.connect();
-    await admin.createTopics({
-        waitForLeaders: true,
-        topics: [
-            { topic: 'PROBLEM_CREATION' },
-            { topic: 'PROBLEM_UPDATION' },
-            { topic: 'PROBLEM_DELETION' },
-        ],
-    })
+    // await admin.connect();
+    // await admin.createTopics({
+    //     waitForLeaders: true,
+    //     topics: [
+    //         { topic: 'PROBLEM_CREATION' },
+    //         { topic: 'PROBLEM_UPDATION' },
+    //         { topic: 'PROBLEM_DELETION' },
+    //     ],
+    // })
     await producer.connect();
     console.log("💬 Established connection with Kafka.");
 };
@@ -30,7 +31,20 @@ run().catch(console.error);
 
 const GetProblems = asyncHandler(async (req, res) => {
     try {
-        const problems = await Problem.find();
+        // let problems;
+        // const { id } = req.query;
+        // if (id) {
+        //     problems = await Problem.find({
+        //         $or: [
+        //             { _id: id }, // Find exact match
+        //             { _id: { $regex: new RegExp(`^${id}`, 'i') } }
+        //         ]
+        //     }).sort({ modifiedAt: 1 });
+        // } else {
+        //     problems = await Problem.find();
+        // }
+        // console.log(problems);
+        const problems = await Problem.find().sort({ modifiedAt: -1 });
         res.status(200).send(problems);
     } catch (error) {
         res.status(500).send({ message: "Could not fetch problems.", error: error.message });
@@ -62,7 +76,9 @@ const PostProblem = asyncHandler(async (req, res) => {
         hint
     } = req.body;
 
-    const problem = await Problem.create({ title, description, difficulty, tags, hint });
+    const slug = slugify(title);
+
+    const problem = await Problem.create({ title, description, slug, difficulty, tags, hint });
 
     const message = { key: 'problem_created', value: JSON.stringify(problem) };
     try {
@@ -88,8 +104,10 @@ const PutProblem = asyncHandler(async (req, res) => {
         hint
     } = req.body;
 
+    let slug = slugify(title);
+
     try {
-        const data = { title, description, difficulty, tags, hint };
+        const data = { title, slug, description, difficulty, tags, hint };
 
         const updatedProblem = await Problem.findByIdAndUpdate(problemId, data, { new: true });
 

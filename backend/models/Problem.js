@@ -1,13 +1,19 @@
 import mongoose from 'mongoose';
-import { nanoid } from 'nanoid';
+import { customAlphabet } from 'nanoid';
+const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const nanoid = customAlphabet(alphabet, 6);
 
 const problemSchema = new mongoose.Schema({
     problemId: {
         type: String,
         required: true,
-        default: nanoid
+        default: () => nanoid()
     },
     title: {
+        type: String,
+        required: true
+    },
+    slug: {
         type: String,
         required: true
     },
