@@ -59,6 +59,10 @@ const problemSchema = new mongoose.Schema({
     modifiedAt: {
         type: Date,
         default: Date.now
+    },
+    isPublished: {
+        type: Boolean,
+        default: false
     }
 });
 

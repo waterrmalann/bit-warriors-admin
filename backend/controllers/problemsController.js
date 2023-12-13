@@ -12,6 +12,7 @@ const kafka = new Kafka({
 // const admin = kafka.admin();
 
 const producer = kafka.producer();
+const consumer = kafka.consumer({ groupId: "problem-ack-consumption" })
 
 const run = async () => {
     // await admin.connect();
@@ -24,27 +25,48 @@ const run = async () => {
     //     ],
     // })
     await producer.connect();
+    await consumer.connect();
     console.log("💬 Established connection with Kafka.");
+
+    await consumer.subscribe({ topics: ['PROBLEM_ACK'] });
+    console.log("\t - Subscribed to PROBLEM_ACK");
+
+    await consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+            const data = JSON.parse(message.value.toString());
+            switch (topic) {
+                case "PROBLEM_ACK": {
+                    console.log("[PROBLEM_ACK] A problem CRUD was acknowledged for " + data.topic);
+                    if (data.topic === 'PROBLEM_CREATION') {
+                        await Problem.findOneAndUpdate({ problemId: data.problemId }, { isPublished: true })
+                    }
+                    break;
+                }
+            }
+        },
+    });
 };
 
 run().catch(console.error);
 
+
+
 const GetProblems = asyncHandler(async (req, res) => {
     try {
-        // let problems;
-        // const { id } = req.query;
-        // if (id) {
-        //     problems = await Problem.find({
-        //         $or: [
-        //             { _id: id }, // Find exact match
-        //             { _id: { $regex: new RegExp(`^${id}`, 'i') } }
-        //         ]
-        //     }).sort({ modifiedAt: 1 });
-        // } else {
-        //     problems = await Problem.find();
-        // }
+        let problems;
+        const { id } = req.query;
+        if (id) {
+            problems = await Problem.find({
+                $or: [
+                    { problemId: id }, // Find exact match
+                    { problemId: { $regex: new RegExp(`^${id}`, 'i') } }
+                ]
+            }).sort({ modifiedAt: -1 });
+        } else {
+            problems = await Problem.find().sort({ modifiedAt: -1 });
+        }
         // console.log(problems);
-        const problems = await Problem.find().sort({ modifiedAt: -1 });
+        // const problems = await Problem.find().sort({ modifiedAt: -1 });
         res.status(200).send(problems);
     } catch (error) {
         res.status(500).send({ message: "Could not fetch problems.", error: error.message });
