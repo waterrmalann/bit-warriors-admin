@@ -28,12 +28,14 @@ import { useState } from "react"
 import { useToast } from "@components/ui/use-toast"
 import useProblem from "@hooks/useProblem"
 import { useNavigate } from "react-router-dom"
+import axios from "axios"
+import { API_ROUTES } from "@/lib/routes"
 
 
 export default function DashboardNewProblemPage() {
 
   const { toast } = useToast();
-  const { createProblem } = useProblem();
+  const { createProblem } = useProblem('');
   const navigate = useNavigate();
 
   const [questionDescription, setQuestionDescription] = useState('');
@@ -41,6 +43,11 @@ export default function DashboardNewProblemPage() {
   const [questionDifficulty, setQuestionDifficulty] = useState('');
   const [questionTags, setQuestionTags] = useState('');
   const [questionHint, setQuestionHint] = useState('');
+
+  const [testCases, setTestCases] = useState('');
+  const [functionName, setFunctionName] = useState('');
+  const [language, setLanguage] = useState('');
+  const [preloadedCode, setPreloadedCode] = useState('');
 
 
   async function handleSubmission() {
@@ -66,7 +73,31 @@ export default function DashboardNewProblemPage() {
       })
     }
 
-    const { error } = await createProblem({
+    if (testCases.length < 1) {
+      return toast({
+        variant: "destructive",
+        title: "Missing Test Cases",
+        description: "There must be atleast one test case defined."
+      })
+    }
+
+    if (functionName.length < 1) {
+      return toast({
+        variant: "destructive",
+        title: "Missing Test Function Name",
+        description: "There must be a function name defined to call."
+      })
+    }
+
+    if (language.length < 1) {
+      return toast({
+        variant: "destructive",
+        title: "Missing Test Language",
+        description: "There must be a language defined for test case."
+      })
+    }
+
+    const { data, error } = await createProblem({
       title: questionTitle,
       description: questionDescription,
       difficulty: questionDifficulty,
@@ -75,19 +106,34 @@ export default function DashboardNewProblemPage() {
     });
 
     if (error) {
-      console.error(error);
       return toast({
         variant: "destructive",
         title: "An error occured.",
         description: error.message
       })
-    } else {
-      toast({
-        title: "Success",
-        description: "Problem was added."
-      });
-      navigate('/dash/problems');
     }
+
+    try {
+      const res = await axios.post(API_ROUTES.TESTS.POST(data._id), {
+        preloadedCode,
+        testCases,
+        functionName,
+        language
+      }, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true
+      });
+      console.log(res);
+    } catch (err) {
+      console.error(err);
+    }
+
+    toast({
+      title: "Success",
+      description: "Problem was added."
+    });
+
+    navigate('/dash/problems');
   }
 
   return (
@@ -355,26 +401,47 @@ export default function DashboardNewProblemPage() {
                   <div className="flex flex-col space-y-4">
                     <div className="grid h-full gap-6 lg:grid-cols-2">
                       <div className="flex flex-col space-y-4">
-                        <div className="flex flex-1 flex-col space-y-2">
-                          <Label htmlFor="input">Preloaded Code</Label>
-                          <Textarea
-                            id="input"
-                            placeholder="preloaded code"
-                            className="flex-1 lg:min-h-[580px]"
-                          />
-                        </div>
                         <div className="flex flex-col space-y-2">
-                          <Label htmlFor="instructions">Instructions</Label>
-                          <Textarea
-                            id="instructions"
-                            placeholder="Solve it in O(n) time complexity."
+                          <Label htmlFor="functionName">Function Name</Label>
+                          <Input
+                            id="functionName"
+                            placeholder="eg: add"
+                            value={functionName}
+                            onChange={e => setFunctionName(e.target.value)}
+                          />
+                          <Label htmlFor="language">Language</Label>
+                          <Input
+                            id="language"
+                            placeholder="eg: js"
+                            value={language}
+                            onChange={e => setLanguage(e.target.value)}
                           />
                         </div>
+                        <div className="flex flex-1 flex-col space-y-2">
+                          <Label htmlFor="preloaded">Preloaded Code</Label>
+                          <Textarea
+                            id="preloaded"
+                            placeholder="// any preloaded code"
+                            className="flex-1 lg:min-h-[580px]"
+                            value={preloadedCode}
+                            onChange={e => setPreloadedCode(e.target.value)}
+                          />
+                        </div>
+
                       </div>
-                      <div className="mt-[21px] min-h-[400px] rounded-md border bg-muted lg:min-h-[700px]" />
+                      <div>
+                        <Label htmlFor="testCases">Test Cases (JSON)</Label>
+                        <Textarea
+                          id="testCases"
+                          placeholder="[...]"
+                          className="flex-1 min-h-[400px] lg:min-h-[700px]"
+                          value={testCases}
+                          onChange={e => setTestCases(e.target.value)}
+                        />
+                      </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button>Submit</Button>
+                      <Button disabled={true}>Submit</Button>
                       <Button variant="secondary">
                         <span className="sr-only">Show history</span>
                         <ClockIcon className="h-4 w-4" />

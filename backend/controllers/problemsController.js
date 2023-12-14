@@ -1,4 +1,5 @@
 import Problem from "../models/Problem.js";
+import Test from '../models/Test.js'
 import asyncHandler from 'express-async-handler';
 
 import { Kafka } from 'kafkajs';
@@ -28,8 +29,8 @@ const run = async () => {
     await consumer.connect();
     console.log("💬 Established connection with Kafka.");
 
-    await consumer.subscribe({ topics: ['PROBLEM_ACK'] });
-    console.log("\t - Subscribed to PROBLEM_ACK");
+    await consumer.subscribe({ topics: ['PROBLEM_ACK', 'TEST_ACK'] });
+    console.log("\t - Subscribed to PROBLEM_ACK, TEST_ACK");
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
@@ -37,8 +38,15 @@ const run = async () => {
             switch (topic) {
                 case "PROBLEM_ACK": {
                     console.log("[PROBLEM_ACK] A problem CRUD was acknowledged for " + data.topic);
-                    if (data.topic === 'PROBLEM_CREATION') {
+                    if (data.topic === 'PROBLEM_CREATION' || data.topic === 'PROBLEM_UPDATION') {
                         await Problem.findOneAndUpdate({ problemId: data.problemId }, { isPublished: true })
+                    }
+                    break;
+                }
+                case "TEST_ACK": {
+                    console.log("[TEST_ACK] A test CRUD was acknowledged for " + data.topic);
+                    if (data.topic === 'TEST_CREATION' || data.topic === 'TEST_UPDATION') {
+                        await Test.findOneAndUpdate({ problemId: data.problemId }, { isPublished: true })
                     }
                     break;
                 }
@@ -113,7 +121,7 @@ const PostProblem = asyncHandler(async (req, res) => {
         console.error(`err: [kafka/problem_updated] ${err}`);
     }
 
-    res.status(201).send({ problemId: problem._id });
+    res.status(201).send({ _id: problem._id, problemId: problem.problemId });
 })
 
 const PutProblem = asyncHandler(async (req, res) => {
@@ -131,7 +139,7 @@ const PutProblem = asyncHandler(async (req, res) => {
     try {
         const data = { title, slug, description, difficulty, tags, hint };
 
-        const updatedProblem = await Problem.findByIdAndUpdate(problemId, data, { new: true });
+        const updatedProblem = await Problem.findByIdAndUpdate(problemId, {...data, isPublished: false}, { new: true });
 
         if (!updatedProblem) {
             return res.status(404).send({ message: "Problem not found" });
@@ -165,6 +173,10 @@ const DeleteProblem = asyncHandler(async (req, res) => {
             return res.status(404).send({ message: "Problem not found" });
         }
 
+        const deletedTests = await Test.deleteMany({ problemId: deletedProblem.problemId });
+        console.log(`Problem '${deletedProblem.slug}' was deleted.`)
+        console.log(`\t - ${deletedTests.deletedCount} associated tests were deleted.`);
+
         const message = { key: 'problem_deleted', value: JSON.stringify({ id: deletedProblem.problemId }) };
         try {
             await producer.send({
@@ -180,6 +192,103 @@ const DeleteProblem = asyncHandler(async (req, res) => {
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
+});
+
+
+const GetTestCases = asyncHandler(async (req, res) => {
+    const { problemId } = req.params;
+
+    try {
+        const problem = await Problem.findById(problemId);
+        
+        if (!problem) {
+            return res.status(404).send({ message: "Problem not found" });
+        }
+
+        // todo: find() not findOne()
+        const testCases = await Test.findOne({ problem: problemId });
+
+        res.status(200).json(testCases);
+    } catch (error) {
+        res.status(500).send({ message: "Error fetching tests", error: error.message });
+    }
 })
 
-export default { GetProblem, GetProblems, PostProblem, PutProblem, DeleteProblem }
+const PostTestCase = asyncHandler(async (req, res) => {
+    const { problemId, testId } = req.params;
+    const {
+        preloadedCode,
+        testCases,
+        functionName,
+        language
+    } = req.body;
+    
+    let testCaseObjects;
+    try {
+        testCaseObjects = JSON.parse(testCases);
+    } catch (err) {
+        return res.status(400).send({ message: "invalid JSON given for test cases" })
+    }
+
+    const problem = await Problem.findById(problemId);
+
+    if (!problem) {
+        return res.status(404).send({ message: "Problem not found" });
+    }
+
+    const testCase = await Test.create({ problem: problem._id, problemId: problem.problemId, preloadedCode, testCases: testCaseObjects, functionName, language });
+
+    const message = { key: 'test_created', value: JSON.stringify(testCase) };
+    try {
+        await producer.send({
+            topic: 'TEST_CREATION',
+            messages: [message],
+        });
+        console.log(`[kafka] test creation message was sent ${JSON.stringify(message)}`)
+    } catch (err) {
+        console.error(`err: [kafka/test_updated] ${err}`);
+    }
+
+    res.status(201).send({ problemId: problem._id });
+})
+
+const PutTestCases = asyncHandler(async (req, res) => {
+    const { problemId, testId } = req.params;
+    const {
+        preloadedCode,
+        testCases,
+        functionName,
+        language
+    } = req.body;
+
+    try {
+        const data = { preloadedCode, testCases: JSON.parse(testCases), functionName, language };
+
+        const updatedTest = await Test.findOneAndUpdate({ problem: problemId }, {...data, isPublished: false}, { new: true });
+
+        if (!updatedTest) {
+            return res.status(404).send({ message: "Test not found" });
+        }
+
+        const message = { key: 'test_updated', value: JSON.stringify({ id: updatedTest.problemId, data: data }) };
+
+        try {
+            await producer.send({
+                topic: 'TEST_UPDATION',
+                messages: [message],
+            });
+            console.log(`[kafka] updation message was sent ${JSON.stringify(message)}`)
+        } catch (err) {
+            console.error(`err: [kafka/test_updated] ${err}`);
+        }
+
+        res.status(200).send({ success: true });
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+})
+
+export default { 
+    GetProblem, GetProblems, PostProblem, PutProblem, DeleteProblem,
+    GetTestCases, PostTestCase, PutTestCases
+}

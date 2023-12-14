@@ -1,5 +1,5 @@
 
-import { ChevronDownIcon, PlusIcon, StarIcon, CircleIcon, PenIcon } from "lucide-react";
+import { StarIcon, CircleIcon, PenIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -9,16 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Separator } from "@/components/ui/separator";
+
 import { Link } from "react-router-dom";
 
 interface ProblemCardProps {
@@ -26,9 +17,10 @@ interface ProblemCardProps {
     code: string;
     title: string;
     updatedAt: Date;
+    isPublished: boolean;
 }
 
-export function ProblemCard({ _id, code, title, updatedAt }: ProblemCardProps) {
+export function ProblemCard({ _id, code, title, updatedAt, isPublished }: ProblemCardProps) {
     return (
         <Card>
             <CardHeader className="grid grid-cols-[1fr_110px] items-start gap-4 space-y-0">
@@ -49,8 +41,14 @@ export function ProblemCard({ _id, code, title, updatedAt }: ProblemCardProps) {
             <CardContent>
                 <div className="flex space-x-4 text-sm text-muted-foreground">
                     <div className="flex items-center">
-                        <CircleIcon className="mr-1 h-3 w-3 fill-sky-400 text-sky-400" />
-                        TypeScript
+                        {
+                            isPublished ? (
+                                <CircleIcon className="mr-1 h-3 w-3 fill-green-400 text-green-400" />
+                            ) : (
+                                <CircleIcon className="mr-1 h-3 w-3 fill-red-400 text-red-400" />
+                            )
+                        }
+                        {isPublished ? "Published" : "Pending"}
                     </div>
                     <div className="flex items-center">
                         <StarIcon className="mr-1 h-3 w-3" />

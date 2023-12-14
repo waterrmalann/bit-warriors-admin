@@ -12,4 +12,10 @@ router.put('/:problemId', problemsController.PutProblem);
 
 router.delete('/:problemId', problemsController.DeleteProblem);
 
+router.get('/:problemId/tests', problemsController.GetTestCases);
+router.post('/:problemId/tests', problemsController.PostTestCase);
+router.put('/:problemId/tests/:testId', problemsController.PutTestCases);
+
+// router.get('/', problemsController)
+
 export default router;
