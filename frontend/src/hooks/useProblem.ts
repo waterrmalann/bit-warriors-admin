@@ -10,11 +10,13 @@ type Problem = {
     difficulty: string;
     tags: string;
     hint?: string;
+    isPublished: boolean;
 }
 
-type ProblemData = Omit<Problem, "_id" | "problemId">;
+type ProblemData = Omit<Problem, "_id" | "problemId" | "isPublished">;
 
 interface ProblemCreationResponse {
+    _id: string;
     problemId: string;
 }
 
@@ -63,8 +65,8 @@ async function problemsFetcher(url: string) {
     return res.data;
 }
 
-export default function useProblem() {
-    const { data: problems, mutate, error, isLoading } = useSWR<Problem[]>(API_ROUTES.PROBLEMS.GET, problemsFetcher);
+export default function useProblem(search: string) {
+    const { data: problems, mutate, error, isLoading } = useSWR<Problem[]>(search !== '' ? API_ROUTES.PROBLEMS.SEARCH_GET(search): API_ROUTES.PROBLEMS.GET, problemsFetcher);
     console.log(problems);
 
     return {
