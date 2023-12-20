@@ -19,6 +19,7 @@ const testSchema = new mongoose.Schema({
     },
     functionName: {
         type: String,
+        required: true
     },
     testCases: [{
         _id: false,
