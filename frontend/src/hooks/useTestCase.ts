@@ -13,6 +13,7 @@ type TestCase = {
     problem: string;
     problemId: string;
     preloadedCode?: string;
+    language: string;
     functionName: string;
     testCases: Test[],
     isPublished: boolean;
