@@ -6,7 +6,9 @@ dotenv.config();
 // todo: Need a service discovery.
 const services = {
     "User Service": process.env.USER_SERVICE,
-    "Problem Service": process.env.PROBLEMS_SERVICE
+    "Problem Service": process.env.PROBLEMS_SERVICE,
+    "Submission Service": process.env.SUBMISSION_SERVICE,
+    "Test Service": process.env.TEST_SERVICE
 }
 
 const GetStatus = asyncHandler(async (req, res) => {
